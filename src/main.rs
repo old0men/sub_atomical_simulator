@@ -35,9 +35,10 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, (screen::spawn_camera,))
         .add_systems(Update, (
-            physics::gravity,
+            movement::direction_system,
             movement::acceleration_system,
             movement::move_system,
+            physics::gravity,
             screen::border_system,
             spawn_proton.pipe(spawn::spawn_particle)
                     .run_if(input_just_pressed(KeyCode::Digit1)),

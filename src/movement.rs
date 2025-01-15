@@ -53,21 +53,8 @@ pub fn acceleration_system(
 ){
     for mut movement in query.iter_mut() {
 
-        if movement.direction.x > 0.0 && movement.acceleration.x * time.delta_secs() > 0.0 {
-            movement.speed.x += movement.acceleration.x * time.delta_secs()
-        }
-
-        if movement.direction.x < 0.0 && movement.acceleration.x * time.delta_secs() < 0.0 {
-            movement.speed.x += -movement.acceleration.x * time.delta_secs()
-        }
-
-        if movement.direction.y > 0.0 && movement.acceleration.y * time.delta_secs() > 0.0 {
-            movement.speed.y += movement.acceleration.y * time.delta_secs()
-        }
-
-        if movement.direction.y < 0.0 && movement.acceleration.y * time.delta_secs() < 0.0 {
-            movement.speed.y += -movement.acceleration.y * time.delta_secs()
-        }
+        movement.speed.x += movement.direction.x*movement.acceleration.x*time.delta_secs();
+        movement.speed.y += movement.direction.y*movement.acceleration.y*time.delta_secs();
 
         if buttons.just_pressed(KeyCode::ArrowUp) {
             movement.acceleration.y += 0.1;

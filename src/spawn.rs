@@ -16,9 +16,9 @@ pub fn spawn_particle(
         //let rand_y = rng.gen_range(-3.0..3.0);
         let screen = screen::check_screen(*q_windows);
         let mut mass:f32 = 0.0;
-        if color == RED {mass=10000.0}
-        else if color == BLUE {mass=1.0}
-        else if color == GREY {mass=1.0}
+        if color == RED {mass=1.0}
+        else if color == BLUE {mass=1836.0}
+        else if color == GREY {mass=1836.0}
 
         commands.spawn((
             Mesh2d(meshes.add(Circle::default())),

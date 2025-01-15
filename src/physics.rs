@@ -52,30 +52,22 @@ pub fn gravity(
                                                 (particle1.0.translation.y-particle2.0.translation.y)/distance,
                                                 0.0);
 
-            let current_acceleration_change1 = Vec2::new(FORCE_GRAVITY*((particle2.1.mass/(distance*0.00003268).powf(2.0))/direction_particle1.x),
-                                                         FORCE_GRAVITY*((particle2.1.mass/(distance*0.00003268).powf(2.0))/direction_particle1.y));
-            let current_acceleration_change2 = Vec2::new(FORCE_GRAVITY*((particle1.1.mass/(distance*0.00003268).powf(2.0))/direction_particle2.x),
-                                                         FORCE_GRAVITY*((particle1.1.mass/(distance*0.00003268).powf(2.0))/direction_particle2.y));
+            let current_acceleration_change1 = Vec2::new(FORCE_GRAVITY*((particle2.1.mass/(distance*0.00003268).powf(2.0))/direction_particle1.x), FORCE_GRAVITY*((particle2.1.mass/(distance*0.00003268).powf(2.0))/direction_particle1.y));
+            let current_acceleration_change2 = Vec2::new(FORCE_GRAVITY*((particle1.1.mass/(distance*0.00003268).powf(2.0))/direction_particle2.x), FORCE_GRAVITY*((particle1.1.mass/(distance*0.00003268).powf(2.0))/direction_particle2.y));
 
 
-            let acceleration_difference1_x = current_acceleration_change1.x;
-            let acceleration_difference1_y = current_acceleration_change1.y;
-            let acceleration_difference2_x = current_acceleration_change2.x;
-            let acceleration_difference2_y = current_acceleration_change2.y;
+
+            particle1.2.acceleration.x = current_acceleration_change1.x.copysign(1.0);
+            particle1.2.acceleration.y = current_acceleration_change1.y.copysign(1.0);
+            particle2.2.acceleration.x = current_acceleration_change2.x.copysign(1.0);
+            particle2.2.acceleration.y = current_acceleration_change2.y.copysign(1.0);;
 
 
-            particle1.2.acceleration.x = acceleration_difference1_x;
-            particle1.2.acceleration.y = acceleration_difference1_y;
-            particle2.2.acceleration.x = acceleration_difference2_x;
-            particle2.2.acceleration.y = acceleration_difference2_y;
-
-            /*
             gizmos.line_2d(
                 Vec2::new(particle2.0.translation.x, particle2.0.translation.y),
                 Vec2::new(particle1.0.translation.x, particle1.0.translation.y),
                 GREEN
             )
-             */
         }
     }
 }
