@@ -6,7 +6,6 @@ mod physics;
 use bevy::{color::palettes::basic::{BLUE, RED}, prelude::*};
 pub const GREY: Srgba = Srgba::rgb(0.5, 0.5, 0.5);
 use bevy::input::common_conditions::input_just_pressed;
-use bevy_2d_line::LineRenderingPlugin;
 use rand;
 use rand::Rng;
 
@@ -38,15 +37,15 @@ fn main() {
             movement::direction_system,
             movement::acceleration_system,
             movement::move_system,
-            physics::gravity,
             screen::border_system,
             spawn_proton.pipe(spawn::spawn_particle)
                     .run_if(input_just_pressed(KeyCode::Digit1)),
             spawn_electron.pipe(spawn::spawn_particle)
                     .run_if(input_just_pressed(KeyCode::Digit2)),
             spawn_neutron.pipe(spawn::spawn_particle)
-                    .run_if(input_just_pressed(KeyCode::Digit3))
-            ),
+                    .run_if(input_just_pressed(KeyCode::Digit3)),
+            clear_terminal
+            ).chain(),
         )
         .run();
 }
@@ -61,4 +60,8 @@ fn spawn_proton() -> Srgba {
 
 fn spawn_neutron() -> Srgba {
     GREY
+}
+
+fn clear_terminal(){
+    print!("\x1B[2J\x1B[1;1H");
 }
