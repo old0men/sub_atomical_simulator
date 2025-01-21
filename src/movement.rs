@@ -25,23 +25,22 @@ pub fn direction_check(to: Vec3, from: Vec3) -> Vec3 {
     } else {
         direction_y = 1.0
     }
-    Vec3::new(direction_x, direction_y, 0.0)}
+    Vec3::new(direction_x, direction_y, 0.0)
+}
 
 pub fn move_system(mut q_transform: Query<(&mut Transform, &Movement), With<Movement>>){
     for (mut transform, movement) in q_transform.iter_mut() {
-        if movement.speed.x < 50.0 || movement.speed.y < 50.0{
+        if movement.speed.x < 10.0 && movement.speed.x > -10.0{
             transform.translation.x += movement.speed.x;
-            transform.translation.y += movement.speed.y;
-        } else if movement.speed.x < -50.0 || movement.speed.y < -50.0{
-            transform.translation.x += movement.speed.x;
-            transform.translation.y += movement.speed.y;
-        } else if movement.speed.x.signum() == 1.0 || movement.speed.y.signum() == 1.0 {
-            transform.translation.x += 50.0;
-            transform.translation.y += 50.0;
         } else {
-            transform.translation.x -= 50.0;
-            transform.translation.y -= 50.0;
+            transform.translation.x += 10.0*movement.direction.x;
         }
+        if movement.speed.y < 10.0 && movement.speed.y > -10.0{
+            transform.translation.y += movement.speed.y;
+        } else {
+            transform.translation.y += 10.0*movement.direction.y;
+        }
+
         println!("x: {}, y: {}", transform.translation.x, transform.translation.y);
     }
 }
@@ -53,8 +52,8 @@ pub fn acceleration_system(
 ){
     for mut movement in query.iter_mut() {
 
-        movement.speed.x += movement.direction.x*movement.acceleration.x*time.delta_secs();
-        movement.speed.y += movement.direction.y*movement.acceleration.y*time.delta_secs();
+        movement.speed.x += movement.acceleration.x*time.delta_secs();
+        movement.speed.y += movement.acceleration.y*time.delta_secs();
 
         if buttons.just_pressed(KeyCode::ArrowUp) {
             movement.acceleration.y += 0.1;
@@ -70,6 +69,6 @@ pub fn acceleration_system(
         }
         */
 
-        //println!("speed.x: {}, acc.x: {}, speed.y: {}, acc.y: {}", movement.speed.x, movement.acceleration.x, movement.speed.y, movement.acceleration.y);
+        println!("speed.x: {}, acc.x: {}, speed.y: {}, acc.y: {}", movement.speed.x, movement.acceleration.x, movement.speed.y, movement.acceleration.y);
     }
 }
