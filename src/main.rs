@@ -2,6 +2,8 @@ mod movement;
 mod screen;
 mod spawn;
 mod physics;
+mod electromagnetism_clac;
+mod constants;
 
 use bevy::{color::palettes::basic::{BLUE, RED}, prelude::*};
 pub const GREY: Srgba = Srgba::rgb(0.5, 0.5, 0.5);
@@ -35,7 +37,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, (screen::spawn_camera, ))
         .add_systems(Update, (
-            physics::electromagnetism,
+            physics::electromagnetism_simplified,
             movement::direction_system,
             movement::acceleration_system,
             movement::move_system,

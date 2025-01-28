@@ -1,10 +1,6 @@
+use crate::{Movement, Particle, constants as cns, electromagnetism_clac};
 use bevy::prelude::*;
-use bevy::{color::palettes::css::{GREEN}};
-use crate::{Particle, Movement};
-
-const  FORCE_GRAVITY: f32 = 6.67430e-11f32;
-const COULOMBS_CONSTANT: f32 = 8987551787.997911;
-const ELEMENTARY_CHARGE: f32 = 1.60217663e-19f32;
+use bevy::color::palettes::css::GREEN;
 
 
 fn acceleration_direction_gravity(from_x1: f32, from_y1: f32, to_x1: f32, to_y1: f32, distance: f32) -> Vec3 {
@@ -30,7 +26,7 @@ fn acceleration_direction_em( from_x1: f32, from_y1: f32, to_x1: f32, to_y1: f32
 fn distance(
     from_x1: f32, from_y1: f32, to_x1: f32, to_y1: f32
 ) -> f32 {
-    (((to_x1 - from_x1).powf(2.0)+(to_y1 - from_y1).powf(2.0)).sqrt())*10e-15f32
+    (((to_x1 - from_x1).powf(2.0)  +  (to_y1 - from_y1).powf(2.0)).sqrt()) * ( 2.4 * 10e-15f32)
 }
 
 #[warn(dead_code)]
@@ -72,8 +68,11 @@ pub fn gravity(
                                                         distance
             );
 
-            let current_acceleration_change1 = Vec2::new(FORCE_GRAVITY*((particle2.1.mass/(distance*0.000003268).powf(2.0))*direction_particle1.x), FORCE_GRAVITY*((particle2.1.mass/(distance*0.00003268).powf(2.0))*direction_particle1.y));
-            let current_acceleration_change2 = Vec2::new(FORCE_GRAVITY*((particle1.1.mass/(distance*0.000003268).powf(2.0))*direction_particle2.x), FORCE_GRAVITY*((particle1.1.mass/(distance*0.00003268).powf(2.0))*direction_particle2.y));
+            let current_acceleration_change1 = Vec2::new(cns::FORCE_GRAVITY*((particle2.1.mass/(distance*0.000003268).powf(2.0))*direction_particle1.x),
+                                                                cns::FORCE_GRAVITY*((particle2.1.mass/(distance*0.00003268).powf(2.0))*direction_particle1.y));
+
+            let current_acceleration_change2 = Vec2::new(cns::FORCE_GRAVITY*((particle1.1.mass/(distance*0.000003268).powf(2.0))*direction_particle2.x),
+                                                                cns::FORCE_GRAVITY*((particle1.1.mass/(distance*0.00003268).powf(2.0))*direction_particle2.y));
 
 
             particle1.2.acceleration.x = current_acceleration_change1.x;
@@ -94,7 +93,7 @@ pub fn gravity(
 
 
 
-pub fn electromagnetism(
+pub fn electromagnetism_simplified(
     mut query: Query<(&Transform, &mut Particle, &mut Movement)>,
     mut gizmos: Gizmos
 ){
@@ -112,7 +111,7 @@ pub fn electromagnetism(
         if distance*10e13f32 < 250.0 {
 
             // for now not applying the charge value of the particles because it's always the absolut charge so 1 and therefore not needed
-            let electrical_force = (COULOMBS_CONSTANT*ELEMENTARY_CHARGE.powf(2.0)) / distance.powf(2.0);
+            let electrical_force = (cns::COULOMBS_CONSTANT * cns::ELEMENTARY_CHARGE.powf(2.0)) / distance.powf(2.0);
 
             println!("electrical force: {}; distance: {}", electrical_force, distance*10e12f32);
 
@@ -163,5 +162,15 @@ pub fn electromagnetism(
             );
 
         }
+    }
+}
+
+fn electromagnetism (
+    mut query: Query<(&Transform, &mut Particle, &mut Movement)>,
+    mut gizmos: Gizmos
+){
+    let mut combinations = query.iter_combinations_mut();
+    while let Some([mut particle1, mut particle2]) = combinations.fetch_next() {
+
     }
 }
