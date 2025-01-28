@@ -6,8 +6,7 @@ mod physics;
 use bevy::{color::palettes::basic::{BLUE, RED}, prelude::*};
 pub const GREY: Srgba = Srgba::rgb(0.5, 0.5, 0.5);
 use bevy::input::common_conditions::input_just_pressed;
-use rand;
-use rand::Rng;
+
 
 struct Screen {
     width: f32,
@@ -19,21 +18,24 @@ impl Screen {
 
 #[derive(Component)]
 struct Particle {
-    mass: f32
+    mass: f32,
+    charge: f32
 }
 
 #[derive(Component)]
 struct Movement {
     speed: Vec2,
     acceleration: Vec2,
+    prev_acceleration: Vec2,
     direction: Vec3
 }
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_systems(Startup, (screen::spawn_camera,))
+        .add_systems(Startup, (screen::spawn_camera, ))
         .add_systems(Update, (
+            physics::electromagnetism,
             movement::direction_system,
             movement::acceleration_system,
             movement::move_system,
@@ -44,7 +46,8 @@ fn main() {
                     .run_if(input_just_pressed(KeyCode::Digit2)),
             spawn_neutron.pipe(spawn::spawn_particle)
                     .run_if(input_just_pressed(KeyCode::Digit3)),
-            clear_terminal
+            spawn::spawn_particle_test.run_if(input_just_pressed(KeyCode::Digit4)),
+            //clear_terminal
             ).chain(),
         )
         .run();
