@@ -11,8 +11,8 @@ fn acceleration_direction_gravity(from_x1: f32, from_y1: f32, to_x1: f32, to_y1:
 }
 
 fn acceleration_direction_em( from_x1: f32, from_y1: f32, to_x1: f32, to_y1: f32, distance: f32, charge1: f32, charge2: f32) -> Vec3 {
-    let result = Vec3::new((to_x1-from_x1)/(distance*10e9f32),
-              (to_y1-from_y1)/(distance*10e9f32),
+    let result = Vec3::new((to_x1-from_x1)/((distance/2.4)*10e9f32),
+              (to_y1-from_y1)/((distance/2.4)*10e9f32),
               0.0);
     if charge2 == 0.0 || charge1 == 0.0 {
         Vec3::new(0.0,0.0,0.0)
@@ -107,15 +107,21 @@ pub fn electromagnetism_simplified(
             particle2.0.translation.x,
             particle2.0.translation.y
         );
+        println!("distance: {}", distance/(2.4*10e-15f32));
 
-        if distance*10e13f32 < 250.0 {
+        if distance/(2.4*10e-15f32 ) < 250.0 {
+            gizmos.line_2d(
+                Vec2::new(particle2.0.translation.x, particle2.0.translation.y),
+                Vec2::new(particle1.0.translation.x, particle1.0.translation.y),
+                GREEN
+            );
 
             // for now not applying the charge value of the particles because it's always the absolut charge so 1 and therefore not needed
             let electrical_force = (cns::COULOMBS_CONSTANT * cns::ELEMENTARY_CHARGE.powf(2.0)) / distance.powf(2.0);
 
-            println!("electrical force: {}; distance: {}", electrical_force, distance*10e12f32);
+            //println!("electrical force: {}; distance: {}", electrical_force, distance*2.4*10e15f32);
 
-            println!("distance:  {}", distance);
+            //println!("distance:  {}", distance);
 
             let acc_dir1 = acceleration_direction_em(
                                                 particle1.0.translation.x,
@@ -127,7 +133,7 @@ pub fn electromagnetism_simplified(
                                                 particle2.1.charge
                                             );
 
-            println!("dir one:  {:?}", acc_dir1);
+            //println!("dir one:  {:?}", acc_dir1);
 
 
             let acc_dir2 = acceleration_direction_em(
@@ -154,13 +160,6 @@ pub fn electromagnetism_simplified(
             particle1.2.prev_acceleration.y = curr_acceleration1y;
             particle2.2.prev_acceleration.x = curr_acceleration2x;
             particle2.2.prev_acceleration.y = curr_acceleration2y;
-
-            gizmos.line_2d(
-                Vec2::new(particle2.0.translation.x, particle2.0.translation.y),
-                Vec2::new(particle1.0.translation.x, particle1.0.translation.y),
-                GREEN
-            );
-
         }
     }
 }

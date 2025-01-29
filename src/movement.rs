@@ -1,5 +1,6 @@
-use bevy::prelude::{Query, Res, Time, Transform, With};
-use crate::Movement;
+use bevy::prelude::{Parent, Query, Res, Text, Time, Transform, With, Without};
+use bevy::text::TextFont;
+use crate::{Movement, Particle};
 
 pub fn direction_system(mut q_transform: Query<&mut Movement, With<Movement>>
 ){
@@ -41,4 +42,25 @@ pub fn acceleration_system(
 
         println!("speed.x: {}, acc.x: {}, speed.y: {}, acc.y: {}", movement.speed.x, movement.acceleration.x, movement.speed.y, movement.acceleration.y);
     }
+}
+
+pub fn text_write(
+    mut text_query: Query<(&mut Text, &Parent), (With<TextFont>, Without<Particle>)>,
+    text_parent_query: Query<&Movement, With<Particle>>,
+){
+
+    for (mut text, parent) in text_query.iter_mut() {
+        let parent_acceleration = text_parent_query.get(parent.get());
+        **text = format!("{}, {}", parent_acceleration.unwrap().acceleration.x.to_string(),parent_acceleration.unwrap().acceleration.y.to_string());
+        println!("{:?}", text);
+    }
+
+    /*
+    for (mut text, parent) in text_query.iter_mut() {
+        **text = "asdf".to_string();
+        println!("{:?}", text)
+    }
+
+     */
+
 }

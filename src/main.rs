@@ -24,7 +24,7 @@ struct Particle {
     charge: f32
 }
 
-#[derive(Component)]
+#[derive(Component, Debug)]
 struct Movement {
     speed: Vec2,
     acceleration: Vec2,
@@ -49,7 +49,8 @@ fn main() {
             spawn_neutron.pipe(spawn::spawn_particle)
                     .run_if(input_just_pressed(KeyCode::Digit3)),
             spawn::spawn_particle_test.run_if(input_just_pressed(KeyCode::Digit4)),
-            //clear_terminal
+            movement::text_write,
+            clear_terminal
             ).chain(),
         )
         .run();
