@@ -7,7 +7,6 @@ pub fn spawn_particle(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    query: Query<(&Transform, &mut Movement)>,
     q_windows: Single<&Window, With<PrimaryWindow>>,
 ) {
     if let Some(position) = q_windows.cursor_position() {
@@ -34,31 +33,34 @@ pub fn spawn_particle(
                 .with_scale(Vec3::splat(diameter)),
             GlobalTransform::default(),
             Movement {
-                speed: Vec2::new(0.0, 0.0),
-                acceleration: Vec2::ZERO,
-                prev_acceleration: Vec2::ZERO,
+                speed: Vec3::ZERO,
+                acceleration: Vec3::ZERO,
+                prev_acceleration: Vec3::ZERO,
                 direction: Vec3::new(1.0, 1.0, 0.0),
             },
             Particle {
                 mass,
                 charge,
+                total_electrical_field: Vec3::ZERO,
+                total_magnetic_field: Vec3::ZERO,
+                connections: 0.0
             }
-        )).with_children(|parent| {
+        ))/*.with_children(|parent| {
             parent.spawn((
-                Text2d::new("0.000005698"),
-                TextFont {
-                    font: Default::default(),
-                    font_size: 50.0,
-
-                    font_smoothing: Default::default(),
-                },
-                TextLayout::new_with_justify(JustifyText::Justified),
-                Transform::from_translation(Vec3::new(1.0, 1.0, 0.0)),
-                TextColor(Color::WHITE),
+                Mesh2d(meshes.add(Rectangle::default())),
+                MeshMaterial2d(materials.add(Color::from(GREEN))),
+                Transform::from_xyz(0.75, 0.75, 0.0)
+                    .with_scale(Vec3::splat(0.5)),
+                )
+            );
+            parent.spawn((
+                Mesh2d(meshes.add(Rectangle::default())),
+                MeshMaterial2d(materials.add(Color::from(RED))),
+                Transform::from_xyz(1.25, 0.75, 0.0)
+                    .with_scale(Vec3::splat(0.5)),
             )
             );
-        });
-
+        })*/;
     }
 }
 
@@ -77,14 +79,17 @@ pub fn spawn_particle_test(
             .with_scale(Vec3::splat(diameter * 1.75)),
         GlobalTransform::default(),
         Movement {
-            speed: Vec2::new(0.0, 0.0),
-            acceleration: Vec2::ZERO,
-            prev_acceleration: Vec2::ZERO,
+            speed: Vec3::ZERO,
+            acceleration: Vec3::ZERO,
+            prev_acceleration: Vec3::ZERO,
             direction: Vec3::new(1.0, 1.0, 0.0),
         },
         Particle {
             mass: 1836.0,
             charge: 1.0,
+            total_electrical_field: Vec3::ZERO,
+            total_magnetic_field: Vec3::ZERO,
+            connections: 0.0
         }
     ));
     commands.spawn((
@@ -94,14 +99,17 @@ pub fn spawn_particle_test(
             .with_scale(Vec3::splat(diameter * 1.75)),
         GlobalTransform::default(),
         Movement {
-            speed: Vec2::new(0.0, 0.0),
-            acceleration: Vec2::ZERO,
-            prev_acceleration: Vec2::ZERO,
+            speed: Vec3::ZERO,
+            acceleration: Vec3::ZERO,
+            prev_acceleration: Vec3::ZERO,
             direction: Vec3::new(1.0, 1.0, 0.0),
         },
         Particle {
             mass: 1836.0,
             charge: 1.0,
+            total_electrical_field: Vec3::ZERO,
+            total_magnetic_field: Vec3::ZERO,
+            connections: 0.0
         }
     ));
 }
