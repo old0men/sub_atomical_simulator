@@ -11,6 +11,7 @@ pub const GREY: Srgba = Srgba::rgb(0.5, 0.5, 0.5);
 pub const GREEN: Srgba = Srgba::rgb(0.0, 1.0, 0.0);
 
 
+
 struct Screen {
     width: f32,
     height: f32,
@@ -47,6 +48,7 @@ fn main() {
         .add_systems(Startup, (screen::spawn_camera))
         .add_systems(Update, (
             physics::electromagnetism,
+            physics::electromagnetism_acceleration,
             movement::direction_system,
             movement::acceleration_system,
             movement::move_system,
@@ -58,7 +60,7 @@ fn main() {
             spawn_neutron.pipe(spawn::spawn_particle)
                     .run_if(input_just_pressed(KeyCode::Digit3)),
             spawn::spawn_particle_test.run_if(input_just_pressed(KeyCode::Digit4)),
-            //clear_terminal
+            clear_terminal
             ).chain(),
         )
         .run();

@@ -15,14 +15,14 @@ pub fn spawn_particle(
         let mut charge: f32 = 0.0;
         let mut diameter: f32 = 16.0;
         if color == RED {
-            mass = 1.0;
+            mass = 10000000.0;
             charge = -1.0;
         } else if color == BLUE {
-            mass = 1836.0;
+            mass = 183600000.0;
             charge = 1.0;
             diameter *= 1.75
         } else if color == GREY {
-            mass = 1836.0;
+            mass = 183600000.0;
             diameter *= 1.75
         }
 
@@ -85,7 +85,7 @@ pub fn spawn_particle_test(
             direction: Vec3::new(1.0, 1.0, 0.0),
         },
         Particle {
-            mass: 1836.0,
+            mass: 1.67e-27f32,
             charge: 1.0,
             total_electrical_field: Vec3::ZERO,
             total_magnetic_field: Vec3::ZERO,
@@ -105,7 +105,7 @@ pub fn spawn_particle_test(
             direction: Vec3::new(1.0, 1.0, 0.0),
         },
         Particle {
-            mass: 1836.0,
+            mass: 1.67e-27f32,
             charge: 1.0,
             total_electrical_field: Vec3::ZERO,
             total_magnetic_field: Vec3::ZERO,
