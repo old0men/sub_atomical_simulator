@@ -1,7 +1,7 @@
-use crate::{Movement, Particle, constants as cns, electromagnetism_clac as emc};
+use crate::{Movement, Particle, constants as cns, electromagnetism_calc as emc, strong_force_calc as sfc};
 use bevy::prelude::*;
-use bevy::color::palettes::css::GREEN;
-use crate::constants::SCALE;
+use bevy::color::palettes::css::{GREEN, ORANGE, RED};
+use crate::constants::{COULOMBS_CONSTANT, SCALE};
 
 fn acceleration_direction_gravity(from_x1: f32, from_y1: f32, to_x1: f32, to_y1: f32, distance: f32) -> Vec3 {
     let result = Vec3::new((to_x1-from_x1)/distance,
@@ -9,8 +9,6 @@ fn acceleration_direction_gravity(from_x1: f32, from_y1: f32, to_x1: f32, to_y1:
                            0.0);
     result
 }
-
-
 
 fn acceleration_direction_em(from_x1: f32, from_y1: f32, to_x1: f32, to_y1: f32, distance: f32, charge1: f32, charge2: f32) -> Vec3 {
     let result = Vec3::new((to_x1-from_x1)/(distance/ SCALE),
@@ -93,8 +91,6 @@ pub fn gravity(
 }
 
 
-
-
 pub fn electromagnetism_simplified(
     mut query: Query<(&Transform, &mut Particle, &mut Movement)>,
     mut gizmos: Gizmos
@@ -120,7 +116,7 @@ pub fn electromagnetism_simplified(
             );
 
             // for now not applying the charge value of the particles because it's always the absolut charge so 1 and therefore not needed
-            let electrical_force = (cns::COULOMBS_CONSTANT * cns::ELEMENTARY_CHARGE.powf(2.0)) / distance.powf(2.0);
+            let electrical_force = (COULOMBS_CONSTANT * cns::ELEMENTARY_CHARGE.powf(2.0)) / distance.powf(2.0);
 
             //println!("electrical force: {}; distance: {}", electrical_force, distance*2.4/SCALE);
 
@@ -167,7 +163,7 @@ pub fn electromagnetism_simplified(
     }
 }
 
-pub fn electromagnetism (
+pub fn acting_forces (
     mut query: Query<(&Transform, &mut Particle, &mut Movement)>,
     mut gizmos: Gizmos
 ){
@@ -181,7 +177,18 @@ pub fn electromagnetism (
             particle2.0.translation.y
         );
 
-        if distance/SCALE < 250.0 {
+        let direction_vector1 = Vec3::new((particle2.0.translation.x-particle1.0.translation.x)/(distance/SCALE),
+                                          (particle2.0.translation.y-particle1.0.translation.y)/(distance/SCALE),
+                                          0.0,);
+        let direction_vector2 = Vec3::new((particle1.0.translation.x-particle2.0.translation.x)/(distance/SCALE),
+                                          (particle1.0.translation.y-particle2.0.translation.y)/(distance/SCALE),
+                                          0.0);
+
+        let velocity1 = Vec3::new(particle1.2.speed.x, particle1.2.speed.y, 0.0);
+        let velocity2 = Vec3::new(particle2.2.speed.x, particle2.2.speed.y, 0.0);
+
+        if distance/SCALE < 250.0 && particle1.1.charge != 0.0 && particle2.1.charge != 0.0{
+
             gizmos.line_2d(
                 Vec2::new(particle2.0.translation.x, particle2.0.translation.y),
                 Vec2::new(particle1.0.translation.x, particle1.0.translation.y),
@@ -190,94 +197,135 @@ pub fn electromagnetism (
 
             /*
             println!("1x: {}, 1y: {}, 2x: {}, 2y: {}", particle1.0.translation.x, particle1.0.translation.y, particle2.0.translation.x, particle2.0.translation.y);
+            println!("distance in femtometers: {}", distance/SCALE);
+             */
 
-            */
-            //println!("distance in femtometers: {}", distance/SCALE);
+            gizmos.line_2d(
+                Vec2::new(particle2.0.translation.x, particle2.0.translation.y),
+                Vec2::new(particle1.0.translation.x, particle1.0.translation.y),
+                GREEN
+            );
+
 
             let electrical_field1 = emc::electrical_field(
                 particle1.1.charge,
-                particle1.0.translation.x,
-                particle1.0.translation.y,
-                particle2.0.translation.x,
-                particle2.0.translation.y,
+                direction_vector1,
                 distance
             );
 
             let electrical_field2 = emc::electrical_field(
                 particle2.1.charge,
-                particle2.0.translation.x,
-                particle2.0.translation.y,
-                particle1.0.translation.x,
-                particle1.0.translation.y,
+                direction_vector2,
                 distance
             );
 
-
             if particle2.1.charge == particle1.1.charge {
-                particle1.1.total_electrical_field += -electrical_field1;
-                particle2.1.total_electrical_field += -electrical_field2;
+                particle1.1.total_electrical_field = -electrical_field1;
+                particle2.1.total_electrical_field = -electrical_field2;
             } else {
-                particle1.1.total_electrical_field += electrical_field1;
-                particle2.1.total_electrical_field += electrical_field2;
+                particle1.1.total_electrical_field = electrical_field1;
+                particle2.1.total_electrical_field = electrical_field2;
             }
+
 
             let magnetic_field1 = emc::magnetical_field(
                 particle1.1.charge,
                 particle1.2.speed.x,
                 particle1.2.speed.y,
-                particle1.0.translation.x,
-                particle1.0.translation.y,
-                particle2.0.translation.x,
-                particle2.0.translation.y,
-                distance/SCALE,
+                direction_vector1,
+                distance,
             );
 
             let magnetic_field2 = emc::magnetical_field(
                 particle2.1.charge,
                 particle2.2.speed.x,
                 particle2.2.speed.y,
-                particle2.0.translation.x,
-                particle2.0.translation.y,
-                particle1.0.translation.x,
-                particle1.0.translation.y,
-                distance/SCALE,
+                direction_vector2,
+                distance,
             );
 
-            particle1.1.total_magnetic_field += magnetic_field1;
-            particle2.1.total_magnetic_field += magnetic_field2;
 
-            particle1.1.connections += 1.0;
-            particle2.1.connections += 1.0;
+            particle1.1.total_magnetic_field = magnetic_field1;
+            particle2.1.total_magnetic_field = magnetic_field2;
+
+
+            particle1.1.total_lorentz_force = emc::loretz_force(
+                particle1.1.charge,
+                particle1.1.total_electrical_field,
+                velocity1,
+                particle1.1.total_magnetic_field,
+            );
+
+            particle2.1.total_lorentz_force = emc::loretz_force(
+                particle2.1.charge,
+                particle2.1.total_electrical_field,
+                velocity2,
+                particle2.1.total_magnetic_field,
+            );
+        }
+
+
+
+        if distance/SCALE < particle1.0.scale.x+1.0 && particle1.1.charge != -1.0 && particle2.1.charge != -1.0{
+
+            gizmos.line_2d(
+                Vec2::new(particle2.0.translation.x, particle2.0.translation.y),
+                Vec2::new(particle1.0.translation.x, particle1.0.translation.y),
+                RED
+            );
+
+            particle1.1.total_strong_force = sfc::strong_force(direction_vector1, distance);
+            particle2.1.total_strong_force = sfc::strong_force(direction_vector2, distance);
+
+        } else if distance/SCALE < particle1.0.scale.x*2.02 && particle1.1.charge != -1.0 && particle2.1.charge != -1.0{
+
+            gizmos.line_2d(
+                Vec2::new(particle2.0.translation.x, particle2.0.translation.y),
+                Vec2::new(particle1.0.translation.x, particle1.0.translation.y),
+                ORANGE
+            );
+
+            particle1.1.total_strong_force = sfc::strong_force(-direction_vector1, distance);
+            particle2.1.total_strong_force = sfc::strong_force(-direction_vector2, distance);
+        };
+
+        let acceleration1 = (particle1.1.total_lorentz_force + particle1.1.total_strong_force)/particle1.1.mass;
+        let acceleration2 = (particle2.1.total_lorentz_force + particle2.1.total_strong_force)/particle2.1.mass;
+
+        particle1.2.acceleration = acceleration1;
+        particle2.2.acceleration = acceleration2;
+
+
+    }
+}
+
+pub fn moc_electromagnetism(
+    mut query: Query<(&Transform, &Particle, &mut Movement)>
+){
+    let mut combinations = query.iter_combinations_mut();
+    while let Some([mut particle1, mut particle2]) = combinations.fetch_next() {
+        let distance = distance(
+            particle1.0.translation.x,
+            particle1.0.translation.y,
+            particle2.0.translation.x,
+            particle2.0.translation.y
+        );
+
+        if distance/SCALE < 250.0 {
+            let electrical_field = (COULOMBS_CONSTANT*cns::ELEMENTARY_CHARGE.powf(2.0))/distance.powf(2.0);
+
+            let direction1 = Vec3::new((particle2.0.translation.x-particle1.0.translation.x)/(distance/SCALE),
+                                           (particle2.0.translation.y-particle1.0.translation.y)/(distance/SCALE),
+                                           0.0,);
+            let direction2 = Vec3::new((particle1.0.translation.x-particle2.0.translation.x)/(distance/SCALE),
+                                              (particle1.0.translation.y-particle2.0.translation.y)/(distance/SCALE),
+                                              0.0);
+
+            particle1.2.acceleration = -1.0*particle1.1.charge*particle2.1.charge*direction1*electrical_field;
+            particle2.2.acceleration = -1.0*particle2.1.charge*particle1.1.charge*direction2*electrical_field;
         }
     }
 }
 
-pub fn electromagnetism_acceleration(
-    mut query: Query<(&Transform, &mut Particle, &mut Movement)>,
-){
-    for mut particle in query.iter_mut() {
 
-        let velocity = Vec3::new(particle.2.speed.x, particle.2.speed.y, 0.0);
-        let force = emc::loretz_force(
-            particle.1.connections,
-            particle.1.charge,
-            particle.1.total_electrical_field,
-            velocity,
-            particle.1.total_magnetic_field,
-        );
 
-        println!("force: {}", force);
-
-        let acceleration_change = (force / particle.1.mass) - particle.2.prev_acceleration;
-        particle.2.acceleration += acceleration_change;
-        //println!("({} / {}) - {}", force, particle.1.mass, particle.2.prev_acceleration);
-
-        particle.2.prev_acceleration = force/particle.1.mass;
-
-        particle.1.total_magnetic_field = Vec3::ZERO;
-        particle.1.total_electrical_field = Vec3::ZERO;
-        particle.1.connections = 0.0;
-
-        //println!("acceleration: {}", particle.2.acceleration)
-    }
-}

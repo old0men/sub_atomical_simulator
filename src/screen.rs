@@ -14,16 +14,22 @@ pub fn check_screen(window: &Window) -> Screen {
 
 pub fn border_system(
     q_windows: Single<&Window, With<PrimaryWindow>>,
-    mut query: Query<(&Transform, &mut Movement), With<Movement>>
+    mut query: Query<(&mut Transform, &mut Movement), With<Movement>>
 ){
     let screen = check_screen(*q_windows);
-    for (transform, mut movement ) in query.iter_mut() {
-        if transform.translation.x >= screen.width || transform.translation.x <= -screen.width {
+    for (mut transform, mut movement ) in query.iter_mut() {
+        if transform.translation.x.abs() >= screen.width {
             //println!("pos:{:?}, width:{:?}", transform.translation.x, screen.width);
+            if transform.translation.x.abs() >= screen.width + 5.0{
+                transform.translation.x = screen.width.copysign(transform.translation.x) + 40.0_f32.copysign(-transform.translation.x)
+            }
             movement.speed.x *= -1.0
         }
-        else if transform.translation.y >= screen.height || transform.translation.y <= -screen.height {
+        if transform.translation.y.abs() >= screen.height {
             //println!("pos:{:?}, height:{:?}", transform.translation.y, screen.height);
+            if transform.translation.y.abs() >= screen.height + 5.0{
+                transform.translation.y = screen.height.copysign(transform.translation.y) + 40.0_f32.copysign(-transform.translation.y)
+            }
             movement.speed.y *= -1.0
         }
     }

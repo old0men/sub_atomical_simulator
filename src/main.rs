@@ -2,11 +2,15 @@ mod movement;
 mod screen;
 mod spawn;
 mod physics;
-mod electromagnetism_clac;
+mod electromagnetism_calc;
+mod strong_force_calc;
 mod constants;
 
 use bevy::{color::palettes::basic::{BLUE, RED}, prelude::*};
 use bevy::input::common_conditions::input_just_pressed;
+use bevy_inspector_egui::quick::{ResourceInspectorPlugin, WorldInspectorPlugin};
+use bevy_inspector_egui::prelude::*;
+
 pub const GREY: Srgba = Srgba::rgb(0.5, 0.5, 0.5);
 pub const GREEN: Srgba = Srgba::rgb(0.0, 1.0, 0.0);
 
@@ -20,21 +24,20 @@ impl Screen {
     fn new(width: f32, height: f32) -> Self { Screen { width, height } }
 }
 
-#[derive(Component)]
-struct Debug {
-    color: Handle<StandardMaterial>
-}
 
-#[derive(Component)]
+#[derive(Component, Reflect, Default)]
+#[reflect(Component)]
 struct Particle {
     mass: f32,
     charge: f32,
     total_electrical_field: Vec3,
     total_magnetic_field: Vec3,
-    connections: f32,
+    total_strong_force: Vec3,
+    total_lorentz_force: Vec3
 }
 
-#[derive(Component, Debug)]
+#[derive(Component, Debug, Reflect, Default)]
+#[reflect(Component)]
 struct Movement {
     speed: Vec3,
     acceleration: Vec3,
@@ -44,11 +47,12 @@ struct Movement {
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins((DefaultPlugins, WorldInspectorPlugin::new()))
         .add_systems(Startup, (screen::spawn_camera))
+        .register_type::<Movement>()
+        .register_type::<Particle>()
         .add_systems(Update, (
-            physics::electromagnetism,
-            physics::electromagnetism_acceleration,
+            physics::acting_forces,
             movement::direction_system,
             movement::acceleration_system,
             movement::move_system,
@@ -80,4 +84,20 @@ fn spawn_neutron() -> Srgba {
 
 fn clear_terminal(){
     print!("\x1B[2J\x1B[1;1H");
+}
+
+impl Movement {
+    fn speed_limit_x(&mut self, limit: f32) -> bool {
+        if self.speed.x.abs() >= limit {
+            self.speed.x = limit.copysign(self.speed.x);
+            false
+        } else { true }
+    }
+
+    fn speed_limit_y(&mut self, limit: f32) -> bool {
+        if self.speed.y.abs() >= limit {
+            self.speed.y = limit.copysign(self.speed.y);
+            false
+        } else { true }
+    }
 }

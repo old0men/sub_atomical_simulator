@@ -15,18 +15,19 @@ pub fn spawn_particle(
         let mut charge: f32 = 0.0;
         let mut diameter: f32 = 16.0;
         if color == RED {
-            mass = 10000000.0;
+            mass = 100.0;
             charge = -1.0;
         } else if color == BLUE {
-            mass = 183600000.0;
+            mass = 1836.0;
             charge = 1.0;
             diameter *= 1.75
         } else if color == GREY {
-            mass = 183600000.0;
+            mass = 1836.0;
             diameter *= 1.75
         }
 
         let parent = commands.spawn((
+            Name::new(format!("Particle {:?}", charge)),
             Mesh2d(meshes.add(Circle::default())),
             MeshMaterial2d(materials.add(Color::from(color))),
             Transform::from_xyz(position.x - screen.width, (position.y - screen.height) * -1.0, 0.0)
@@ -43,7 +44,8 @@ pub fn spawn_particle(
                 charge,
                 total_electrical_field: Vec3::ZERO,
                 total_magnetic_field: Vec3::ZERO,
-                connections: 0.0
+                total_strong_force: Vec3::ZERO,
+                total_lorentz_force: Vec3::ZERO,
             }
         ))/*.with_children(|parent| {
             parent.spawn((
@@ -69,14 +71,13 @@ pub fn spawn_particle_test(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    let mut diameter: f32 = 16.0;
 
 
     commands.spawn((
         Mesh2d(meshes.add(Circle::default())),
         MeshMaterial2d(materials.add(Color::from(BLUE))),
-        Transform::from_xyz(76.0, 35.0, 0.0)
-            .with_scale(Vec3::splat(diameter * 1.75)),
+        Transform::from_xyz(0.0, 0.0, 0.0)
+            .with_scale(Vec3::splat(16.0 * 1.75)),
         GlobalTransform::default(),
         Movement {
             speed: Vec3::ZERO,
@@ -85,33 +86,16 @@ pub fn spawn_particle_test(
             direction: Vec3::new(1.0, 1.0, 0.0),
         },
         Particle {
-            mass: 1.67e-27f32,
+            mass: 1000000000000000000000000000000000.0,
             charge: 1.0,
             total_electrical_field: Vec3::ZERO,
             total_magnetic_field: Vec3::ZERO,
-            connections: 0.0
+            total_strong_force: Vec3::new(10000000000000.0, 100000000000000000000.0, 0.0),
+            total_lorentz_force: Vec3::ZERO,
         }
     ));
-    commands.spawn((
-        Mesh2d(meshes.add(Circle::default())),
-        MeshMaterial2d(materials.add(Color::from(BLUE))),
-        Transform::from_xyz(21.0, -11.0, 0.0)
-            .with_scale(Vec3::splat(diameter * 1.75)),
-        GlobalTransform::default(),
-        Movement {
-            speed: Vec3::ZERO,
-            acceleration: Vec3::ZERO,
-            prev_acceleration: Vec3::ZERO,
-            direction: Vec3::new(1.0, 1.0, 0.0),
-        },
-        Particle {
-            mass: 1.67e-27f32,
-            charge: 1.0,
-            total_electrical_field: Vec3::ZERO,
-            total_magnetic_field: Vec3::ZERO,
-            connections: 0.0
-        }
-    ));
+
+
 }
 
 
