@@ -45,7 +45,7 @@ pub fn strong_force(
 
     let strong_force = (-COUPLING_CONSTANT * COUPLING_CONSTANT)/(EULERS_NUMBER.powf(-chosen_mason*distance as f64)/distance as f64);
 
-    let result = Vec3::new(direction.x*strong_force as f32 * 10e18, direction.y*strong_force as f32 * 10e18, 0.0);
+    let result = Vec3::new(direction.x*strong_force as f32 * 15e18, direction.y*strong_force as f32 * 15e18, 0.0);
 
     println!("strong force: {result}");
     result

@@ -87,17 +87,12 @@ fn clear_terminal(){
 }
 
 impl Movement {
-    fn speed_limit_x(&mut self, limit: f32) -> bool {
+    fn speed_limit(&mut self, limit: f32){
         if self.speed.x.abs() >= limit {
-            self.speed.x = limit.copysign(self.speed.x);
-            false
-        } else { true }
-    }
-
-    fn speed_limit_y(&mut self, limit: f32) -> bool {
+            self.speed.x = limit.copysign(self.direction.x.signum());
+        }
         if self.speed.y.abs() >= limit {
-            self.speed.y = limit.copysign(self.speed.y);
-            false
-        } else { true }
+            self.speed.y = limit.copysign(self.direction.y.signum());
+        }
     }
 }
