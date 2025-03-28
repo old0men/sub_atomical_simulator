@@ -38,6 +38,7 @@ pub fn spawn_particle(
                 acceleration: Vec3::ZERO,
                 prev_acceleration: Vec3::ZERO,
                 direction: Vec3::new(1.0, 1.0, 0.0),
+                acceleration_counter: 0.0
             },
             Particle {
                 mass,
@@ -84,6 +85,7 @@ pub fn spawn_particle_test(
             acceleration: Vec3::ZERO,
             prev_acceleration: Vec3::ZERO,
             direction: Vec3::new(1.0, 1.0, 0.0),
+            acceleration_counter: 0.0
         },
         Particle {
             mass: 1000000000000000000000000000000000.0,

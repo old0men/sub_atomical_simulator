@@ -289,6 +289,8 @@ pub fn acting_forces (
             particle2.1.total_strong_force = sfc::strong_force(-direction_vector2, distance);
         };
 
+
+
         let acceleration1 = (particle1.1.total_lorentz_force + particle1.1.total_strong_force)/particle1.1.mass;
         let acceleration2 = (particle2.1.total_lorentz_force + particle2.1.total_strong_force)/particle2.1.mass;
 

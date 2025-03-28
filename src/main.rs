@@ -42,6 +42,7 @@ struct Movement {
     speed: Vec3,
     acceleration: Vec3,
     prev_acceleration: Vec3,
+    acceleration_counter: f32,
     direction: Vec3
 }
 

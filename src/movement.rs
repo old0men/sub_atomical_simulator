@@ -1,4 +1,4 @@
-use bevy::prelude::{Query, Res, Time, Transform, With};
+use bevy::prelude::{Query, Res, Time, Transform, Vec3, With};
 use crate::{Movement};
 
 pub fn direction_system(mut q_transform: Query<&mut Movement, With<Movement>>
@@ -22,6 +22,15 @@ pub fn acceleration_system(
     time: Res<Time>
 ){
     for mut movement in query.iter_mut() {
+
+        if movement.acceleration-movement.prev_acceleration == Vec3::ZERO && movement.acceleration_counter >= 20.0{
+            movement.acceleration = Vec3::ZERO;
+            movement.acceleration_counter = 0.0;
+        } else {
+            movement.acceleration_counter += 1.0
+        }
+
+        movement.prev_acceleration = movement.acceleration;
 
         movement.speed.x += movement.acceleration.x*time.delta_secs();
         movement.speed.y += movement.acceleration.y*time.delta_secs();

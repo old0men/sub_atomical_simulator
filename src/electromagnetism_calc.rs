@@ -61,7 +61,7 @@ pub fn loretz_force(
     //println!("Lorentz------");
     //println!("Ef: {electrical_field}, Bf: {magnetic_field}, v: {velocity_vector}");
 
-    let velocity_magnetic_field_cross_product = cross_product(magnetic_field, velocity_vector*SCALE);
+    let velocity_magnetic_field_cross_product = cross_product(velocity_vector*SCALE, magnetic_field);
 
     let inner_term = electrical_field+velocity_magnetic_field_cross_product;
 
