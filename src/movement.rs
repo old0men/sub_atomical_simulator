@@ -1,7 +1,7 @@
 use bevy::prelude::{Query, Res, Time, Transform, Vec3, With};
 use crate::{Movement};
 
-pub fn direction_system(mut q_transform: Query<&mut Movement, With<Movement>>
+pub fn direction_system(mut q_transform: Query<&mut Movement>
 ){
     for mut movement in q_transform.iter_mut() {
         movement.direction.x = movement.speed.x.signum();

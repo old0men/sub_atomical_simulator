@@ -58,13 +58,12 @@ fn main() {
             movement::acceleration_system,
             movement::move_system,
             screen::border_system,
-            spawn_proton.pipe(spawn::spawn_particle)
+            spawn_proton.pipe(spawn::spawn_particle_accurate)
                     .run_if(input_just_pressed(KeyCode::Digit1)),
-            spawn_electron.pipe(spawn::spawn_particle)
+            spawn_electron.pipe(spawn::spawn_particle_accurate)
                     .run_if(input_just_pressed(KeyCode::Digit2)),
-            spawn_neutron.pipe(spawn::spawn_particle)
+            spawn_neutron.pipe(spawn::spawn_particle_accurate)
                     .run_if(input_just_pressed(KeyCode::Digit3)),
-            spawn::spawn_particle_test.run_if(input_just_pressed(KeyCode::Digit4)),
             clear_terminal
             ).chain(),
         )

@@ -11,5 +11,8 @@ pub const NEUTRAL_PION: f64 = 134.98e-30 * 1.78;
 pub const RHO: f64 = 775.26e-30 * 1.78;
 pub const OMEGA: f64 = 782.65e-30 * 1.78;
 
+pub const ELECTRON_MASS: f32 = 9.1093837015e-31;
+pub const PROTON_MASS: f32 = 1.67e-27;
+
 pub const EULERS_NUMBER: f64 = std::f64::consts::E;
 

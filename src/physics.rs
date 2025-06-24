@@ -200,12 +200,6 @@ pub fn acting_forces (
             println!("distance in femtometers: {}", distance/SCALE);
              */
 
-            gizmos.line_2d(
-                Vec2::new(particle2.0.translation.x, particle2.0.translation.y),
-                Vec2::new(particle1.0.translation.x, particle1.0.translation.y),
-                GREEN
-            );
-
 
             let electrical_field1 = emc::electrical_field(
                 particle1.1.charge,
@@ -301,33 +295,6 @@ pub fn acting_forces (
     }
 }
 
-pub fn moc_electromagnetism(
-    mut query: Query<(&Transform, &Particle, &mut Movement)>
-){
-    let mut combinations = query.iter_combinations_mut();
-    while let Some([mut particle1, mut particle2]) = combinations.fetch_next() {
-        let distance = distance(
-            particle1.0.translation.x,
-            particle1.0.translation.y,
-            particle2.0.translation.x,
-            particle2.0.translation.y
-        );
-
-        if distance/SCALE < 250.0 {
-            let electrical_field = (COULOMBS_CONSTANT*cns::ELEMENTARY_CHARGE.powf(2.0))/distance.powf(2.0);
-
-            let direction1 = Vec3::new((particle2.0.translation.x-particle1.0.translation.x)/(distance/SCALE),
-                                           (particle2.0.translation.y-particle1.0.translation.y)/(distance/SCALE),
-                                           0.0,);
-            let direction2 = Vec3::new((particle1.0.translation.x-particle2.0.translation.x)/(distance/SCALE),
-                                              (particle1.0.translation.y-particle2.0.translation.y)/(distance/SCALE),
-                                              0.0);
-
-            particle1.2.acceleration = -1.0*particle1.1.charge*particle2.1.charge*direction1*electrical_field;
-            particle2.2.acceleration = -1.0*particle2.1.charge*particle1.1.charge*direction2*electrical_field;
-        }
-    }
-}
 
 
 
