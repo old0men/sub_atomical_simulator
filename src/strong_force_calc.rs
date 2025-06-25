@@ -3,19 +3,6 @@ use crate::constants::*;
 use rand::Rng;
 
 
-
-pub fn moc_strong_force(
-    direction: Vec3,
-    strong_force: Vec3,
-    distance: f32,
-
-) -> Vec3 {
-
-        ( 2500.0 * direction * strong_force.copysign(Vec3::new(1.0, 1.0, 1.0)) ) / ( (distance/SCALE).powf(2.0) )
-
-
-}
-
 pub fn strong_force(
     direction: Vec3,
     distance: f32,
@@ -45,7 +32,7 @@ pub fn strong_force(
 
     let strong_force = (-COUPLING_CONSTANT * COUPLING_CONSTANT)/(EULERS_NUMBER.powf(-chosen_mason*distance as f64)/distance as f64);
 
-    let result = Vec3::new(direction.x*strong_force as f32 * 15e18, direction.y*strong_force as f32 * 15e18, 0.0);
+    let result = Vec3::new(direction.x*strong_force as f32 * 19e18, direction.y*strong_force as f32 * 19e18, 0.0);
 
     println!("strong force: {result}");
     result

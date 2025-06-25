@@ -1,5 +1,7 @@
-use bevy::prelude::{Query, Res, Time, Transform, Vec3, With};
-use crate::{Movement};
+use bevy::color::palettes::basic::RED;
+use bevy::prelude::*;
+use crate::{Movement, Particle};
+use crate::constants::SCALE;
 
 pub fn direction_system(mut q_transform: Query<&mut Movement>
 ){
@@ -11,7 +13,7 @@ pub fn direction_system(mut q_transform: Query<&mut Movement>
 
 pub fn move_system(mut q_transform: Query<(&mut Transform, &mut Movement), With<Movement>>){
     for (mut transform, mut movement) in q_transform.iter_mut() {
-        movement.speed_limit(10.0);
+        movement.speed_limit(5.0);
         transform.translation.x += movement.speed.x;
         transform.translation.y += movement.speed.y;
     }
@@ -38,6 +40,7 @@ pub fn acceleration_system(
         println!("speed.x: {}, acc.x: {}, speed.y: {}, acc.y: {}", movement.speed.x, movement.acceleration.x, movement.speed.y, movement.acceleration.y);
     }
 }
+
 
 
 

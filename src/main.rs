@@ -5,6 +5,7 @@ mod physics;
 mod electromagnetism_calc;
 mod strong_force_calc;
 mod constants;
+mod gravity_calc;
 
 use bevy::{color::palettes::basic::{BLUE, RED}, prelude::*};
 use bevy::input::common_conditions::input_just_pressed;
@@ -30,6 +31,8 @@ impl Screen {
 struct Particle {
     mass: f32,
     charge: f32,
+    atomically_bound: bool,
+    nuclear_bound: bool,
     total_electrical_field: Vec3,
     total_magnetic_field: Vec3,
     total_strong_force: Vec3,
@@ -58,11 +61,11 @@ fn main() {
             movement::acceleration_system,
             movement::move_system,
             screen::border_system,
-            spawn_proton.pipe(spawn::spawn_particle_accurate)
+            spawn_proton.pipe(spawn::spawn_particle)
                     .run_if(input_just_pressed(KeyCode::Digit1)),
-            spawn_electron.pipe(spawn::spawn_particle_accurate)
+            spawn_electron.pipe(spawn::spawn_particle)
                     .run_if(input_just_pressed(KeyCode::Digit2)),
-            spawn_neutron.pipe(spawn::spawn_particle_accurate)
+            spawn_neutron.pipe(spawn::spawn_particle)
                     .run_if(input_just_pressed(KeyCode::Digit3)),
             clear_terminal
             ).chain(),
