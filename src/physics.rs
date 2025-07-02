@@ -8,6 +8,8 @@ use crate::constants::{SCALE};
 pub fn acting_forces (
     mut commands: Commands,
     mut query: Query<(&Transform, &mut Particle, &mut Movement, Entity)>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
     mut gizmos: Gizmos
 ){
     let mut combinations = query.iter_combinations_mut();
@@ -24,12 +26,31 @@ pub fn acting_forces (
         if particle1.1.charge != 0.0 && particle2.1.charge != 0.0 && distance/SCALE < 40.0 && particle1.1.charge != particle2.1.charge {
             particle1.1.atomically_bound = true;
             particle2.1.atomically_bound = true;
+            let mut parent: &(&Transform, Mut<Particle>, Mut<Movement>, Entity) = &particle2;
+
             if particle1.1.charge == -1.0 && distance/SCALE < 30.0{
-                commands.entity(particle1.3).despawn_recursive()
+                commands.entity(particle1.3).despawn_recursive();
             }
             if particle2.1.charge == -1.0 && distance/SCALE < 30.0{
-                commands.entity(particle2.3).despawn_recursive()
+                commands.entity(particle2.3).despawn_recursive();
+                parent = &particle1;
             }
+
+            commands.spawn((
+                Mesh2d(meshes.add(Annulus::new( 1.0, 1.2))),
+                MeshMaterial2d(materials.add(Color::from(RED))),
+                GlobalTransform::default(),
+                Particle {
+                    mass: 100.0,
+                    charge: -1.0,
+                    atomically_bound: false,
+                    nuclear_bound: false,
+                    total_electrical_field: Vec3::ZERO,
+                    total_magnetic_field: Vec3::ZERO,
+                    total_strong_force: Vec3::ZERO,
+                    total_lorentz_force: Vec3::ZERO,
+                }
+            )).set_parent(parent.3);
         }
 
         if distance/SCALE < 250.0 && particle1.1.charge != 0.0 && particle2.1.charge != 0.0{
