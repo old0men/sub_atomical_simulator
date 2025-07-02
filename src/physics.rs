@@ -15,6 +15,7 @@ pub fn acting_forces(
     let mut combinations = query.iter_combinations_mut();
     while let Some([mut particle1, mut particle2]) = combinations.fetch_next() {
         let distance = particle1.0.translation.distance(particle2.0.translation) * SCALE;
+        println!("{distance}");
 
         let entity1 = particle1.3;
         let entity2 = particle2.3;
@@ -24,7 +25,7 @@ pub fn acting_forces(
 
         let velocity1 = particle1.2.speed;
         let velocity2 = particle2.2.speed;
-
+/*
         if particle1.1.charge != 0.0 && particle2.1.charge != 0.0 && distance / SCALE < 30.0 && particle1.1.charge != particle2.1.charge {
             particle1.1.atomically_bound = true;
             particle2.1.atomically_bound = true;
@@ -64,6 +65,8 @@ pub fn acting_forces(
                 parent.1.electron_count += 1.0;
             }
         }
+
+ */
 
         if distance / SCALE < 250.0 && particle1.1.charge != 0.0 && particle2.1.charge != 0.0 {
             gizmos.line_2d(
