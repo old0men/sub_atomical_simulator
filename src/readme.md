@@ -4,3 +4,5 @@ questions to ask:
     question:
         did I use Component correctly,
         Resources
+
+make two systems: acting forces, relationships

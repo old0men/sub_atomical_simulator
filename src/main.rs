@@ -6,15 +6,16 @@ mod electromagnetism_calc;
 mod strong_force_calc;
 mod constants;
 mod gravity_calc;
+mod relationships;
 
 use bevy::{color::palettes::basic::{BLUE, RED}, prelude::*};
 use bevy::input::common_conditions::input_just_pressed;
 use bevy_inspector_egui::quick::{ResourceInspectorPlugin, WorldInspectorPlugin};
 use bevy_inspector_egui::prelude::*;
+use crate::spawn::{ParticleType, SpawnParticle};
 
 pub const GREY: Srgba = Srgba::rgb(0.5, 0.5, 0.5);
 pub const GREEN: Srgba = Srgba::rgb(0.0, 1.0, 0.0);
-
 
 
 struct Screen {
@@ -47,8 +48,20 @@ struct Movement {
     acceleration: Vec3,
     prev_acceleration: Vec3,
     acceleration_counter: f32,
-    direction: Vec3
+    direction: Vec3,
 }
+
+#[derive(Component, Reflect, Default)]
+#[reflect(Component)]
+struct Proton;
+
+#[derive(Component, Reflect, Default)]
+#[reflect(Component)]
+struct Neutron;
+
+#[derive(Component, Reflect, Default)]
+#[reflect(Component)]
+struct Electron;
 
 fn main() {
     App::new()
@@ -62,14 +75,14 @@ fn main() {
             movement::acceleration_system,
             movement::move_system,
             screen::border_system,
-            spawn_proton.pipe(spawn::spawn_particle)
-                    .run_if(input_just_pressed(KeyCode::Digit1)),
+            spawn_proton_system
+                .run_if(input_just_pressed(KeyCode::Digit1)),
             spawn_electron.pipe(spawn::spawn_particle)
-                    .run_if(input_just_pressed(KeyCode::Digit2)),
+                .run_if(input_just_pressed(KeyCode::Digit2)),
             spawn_neutron.pipe(spawn::spawn_particle)
-                    .run_if(input_just_pressed(KeyCode::Digit3)),
+                .run_if(input_just_pressed(KeyCode::Digit3)),
             clear_terminal
-            ).chain(),
+        ).chain(),
         )
         .run();
 }
@@ -82,16 +95,20 @@ fn spawn_proton() -> Srgba {
     BLUE
 }
 
+fn spawn_proton_system(mut commands: Commands) {
+    commands.queue(SpawnParticle::new(ParticleType::PROTON));
+}
+
 fn spawn_neutron() -> Srgba {
     GREY
 }
 
-fn clear_terminal(){
+fn clear_terminal() {
     print!("\x1B[2J\x1B[1;1H");
 }
 
 impl Movement {
-    fn speed_limit(&mut self, limit: f32){
+    fn speed_limit(&mut self, limit: f32) {
         if self.speed.x.abs() >= limit {
             self.speed.x = limit.copysign(self.direction.x.signum());
         }

@@ -1,15 +1,45 @@
-use crate::{Movement, Particle, electromagnetism_calc as emc, strong_force_calc as sfc};
+use crate::{Movement, Particle, electromagnetism_calc as emc, strong_force_calc as sfc, Proton, Neutron, Electron};
 use bevy::prelude::*;
 use bevy::color::palettes::css::{BLUE, GREEN, ORANGE, RED};
+use bevy::ecs::query::QueryEntityError;
+use bevy::ecs::system::SystemParam;
 use bevy::math::NormedVectorSpace;
 use crate::constants::{SCALE};
+use crate::spawn::ParticleType;
 
+#[derive(SystemParam)]
+struct ParticleDifferentiatorParam<'w,'s> {
+    particles: Query<'w, 's, (Has<Proton>, Has<Neutron>, Has<Electron>)>,
+
+}
+
+impl ParticleDifferentiatorParam<'_,'_> {
+    //fn get_type() -> ParticleType
+
+    fn is_proton(&self, entity: Entity) -> bool {
+        if let Some(res) = self.get_entity(entity) {
+            res.0
+        } else {
+            // Handle Entity not found
+            false
+        }
+    }
+
+    fn get_entity(&self, entity: Entity) -> Option<(bool, bool, bool)> {
+        match self.particles.get(entity) {
+            Ok(res) => {
+                Some(res)
+            }
+            Err(_) => {
+                None
+            }
+        }
+    }
+}
 
 pub fn acting_forces(
-    mut commands: Commands,
     mut query: Query<(&Transform, &mut Particle, &mut Movement, Entity, Option<&Children>)>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
+    mut particle_differentiator_param: ParticleDifferentiatorParam,
     mut gizmos: Gizmos,
 ) {
     let mut combinations = query.iter_combinations_mut();
@@ -20,59 +50,16 @@ pub fn acting_forces(
 
         let distance = particle_transform1.translation.distance(particle_transform2.translation) * SCALE;
 
-        let entity1 = particle_entity1;
-        let entity2 = particle_entity2;
+
+        if particle_differentiator_param.is_proton(entity1) {
+            // PROTON
+        }
 
         let direction_vector1 = (particle_transform2.translation - particle_transform1.translation) / (distance / SCALE);
         let direction_vector2 = (particle_transform1.translation - particle_transform2.translation) / (distance / SCALE);
 
         let velocity1 = particle_movement1.speed;
         let velocity2 = particle_movement2.speed;
-
-        let charge1 = particle_particle1.charge;
-        let charge2 = particle_particle2.charge;
-
-        if particle_particle1.charge != 0.0 && particle_particle2.charge != 0.0 && distance / SCALE < 30.0 && particle_particle1.charge != particle_particle2.charge {
-            particle_particle1.atomically_bound = true;
-            particle_particle2.atomically_bound = true;
-
-
-            let (child, parent, particle) = if charge2 == 1.0 {
-                match particle_children1 {
-                    Some(children) => (children, entity1, particle_particle1),
-                    None => _,
-                }
-            } else {
-                (Ok(particle_children2), entity2, particle_particle2)
-            };
-
-            if child.len() <= 1.0 as usize {
-                if charge1 == -1.0 {
-                    commands.entity(entity1).despawn_recursive();
-                } else {
-                    commands.entity(entity2).despawn_recursive();
-                }
-
-                commands.spawn((
-                    Mesh2d(meshes.add(Annulus::new(particle.electron_count, particle.electron_count * 1.2))),
-                    MeshMaterial2d(materials.add(Color::from(RED))),
-                    GlobalTransform::default(),
-                    Particle {
-                        mass: 100.0,
-                        charge: -1.0,
-                        atomically_bound: false,
-                        nuclear_bound: false,
-                        total_electrical_field: Vec3::ZERO,
-                        total_magnetic_field: Vec3::ZERO,
-                        total_strong_force: Vec3::ZERO,
-                        total_lorentz_force: Vec3::ZERO,
-                        electron_count: 0.0,
-                    }
-                )).set_parent(parent);
-
-                particle.electron_count += 1.0;
-            }
-        }
 
 
         if distance / SCALE < 250.0 && particle_particle1.charge != 0.0 && particle_particle2.charge != 0.0 {
