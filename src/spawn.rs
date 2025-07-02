@@ -49,6 +49,7 @@ pub fn spawn_particle(
                 total_magnetic_field: Vec3::ZERO,
                 total_strong_force: Vec3::ZERO,
                 total_lorentz_force: Vec3::ZERO,
+                electron_count: 0.0,
             }
         ));
     }

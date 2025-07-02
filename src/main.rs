@@ -36,7 +36,8 @@ struct Particle {
     total_electrical_field: Vec3,
     total_magnetic_field: Vec3,
     total_strong_force: Vec3,
-    total_lorentz_force: Vec3
+    total_lorentz_force: Vec3,
+    electron_count: f32,
 }
 
 #[derive(Component, Debug, Reflect, Default)]
