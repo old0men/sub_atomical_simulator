@@ -34,8 +34,8 @@ pub fn acceleration_system(
 
         movement.prev_acceleration = movement.acceleration;
 
-        movement.speed.x += movement.acceleration.x*time.delta_secs();
-        movement.speed.y += movement.acceleration.y*time.delta_secs();
+        movement.speed.x += movement.acceleration.x*0.5*time.delta_secs();
+        movement.speed.y += movement.acceleration.y*0.5*time.delta_secs();
 
         println!("speed.x: {}, acc.x: {}, speed.y: {}, acc.y: {}", movement.speed.x, movement.acceleration.x, movement.speed.y, movement.acceleration.y);
     }

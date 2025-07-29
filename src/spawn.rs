@@ -20,10 +20,11 @@ impl Command for SpawnParticle {
     fn apply(self, world: &mut World) {
         world.resource_scope(|world, mut meshes: Mut<Assets<Mesh>>| {
             world.resource_scope(|world, mut materials: Mut<Assets<ColorMaterial>>| {
-                let q_windows = world.query_filtered::<&Window, With<PrimaryWindow>>();
+                let mut q_windows = world.query_filtered::<&Window, With<PrimaryWindow>>();
 
-                if let Some(position) = q_windows.cursor_position() {
-                    let screen = screen::check_screen(*q_windows);
+                let window = q_windows.single(world);
+                if let Some(position) = window.cursor_position() {
+                    let screen = screen::check_screen(window);
                     let mut mass: f32 = 0.0;
                     let mut charge: f32 = 0.0;
                     let mut diameter: f32 = 16.0;
@@ -84,6 +85,39 @@ impl Command for SpawnParticle {
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 pub fn spawn_particle(
     In(color): In<Srgba>,
     mut commands: Commands,
@@ -138,7 +172,4 @@ pub fn spawn_particle(
 }
 
 
-
-
-
-
+*/

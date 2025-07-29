@@ -9,6 +9,7 @@ mod gravity_calc;
 mod relationships;
 
 use bevy::{color::palettes::basic::{BLUE, RED}, prelude::*};
+use bevy::ecs::system::SystemParam;
 use bevy::input::common_conditions::input_just_pressed;
 use bevy_inspector_egui::quick::{ResourceInspectorPlugin, WorldInspectorPlugin};
 use bevy_inspector_egui::prelude::*;
@@ -70,6 +71,7 @@ fn main() {
         .register_type::<Movement>()
         .register_type::<Particle>()
         .add_systems(Update, (
+            // relationships::relationship_system,
             physics::acting_forces,
             movement::direction_system,
             movement::acceleration_system,
@@ -77,9 +79,9 @@ fn main() {
             screen::border_system,
             spawn_proton_system
                 .run_if(input_just_pressed(KeyCode::Digit1)),
-            spawn_electron.pipe(spawn::spawn_particle)
+            spawn_electron_system
                 .run_if(input_just_pressed(KeyCode::Digit2)),
-            spawn_neutron.pipe(spawn::spawn_particle)
+            spawn_neutron_system
                 .run_if(input_just_pressed(KeyCode::Digit3)),
             clear_terminal
         ).chain(),
@@ -87,25 +89,70 @@ fn main() {
         .run();
 }
 
-fn spawn_electron() -> Srgba {
-    RED
-}
-
-fn spawn_proton() -> Srgba {
-    BLUE
-}
-
-fn spawn_proton_system(mut commands: Commands) {
-    commands.queue(SpawnParticle::new(ParticleType::PROTON));
-}
-
-fn spawn_neutron() -> Srgba {
-    GREY
-}
-
 fn clear_terminal() {
     print!("\x1B[2J\x1B[1;1H");
 }
+
+fn spawn_electron_system(mut commands: Commands) {
+    commands.queue(SpawnParticle::new(ParticleType::ELECTRON));
+}
+fn spawn_proton_system(mut commands: Commands) {
+    commands.queue(SpawnParticle::new(ParticleType::PROTON));
+}
+fn spawn_neutron_system(mut commands: Commands) {
+    commands.queue(SpawnParticle::new(ParticleType::NEUTRON));
+}
+
+
+
+
+#[derive(SystemParam)]
+struct ParticleDifferentiatorParam<'w,'s> {
+    particles: Query<'w, 's, (Has<Proton>, Has<Neutron>, Has<Electron>)>,
+
+}
+
+impl ParticleDifferentiatorParam<'_,'_> {
+    //fn get_type() -> ParticleType
+
+    fn is_proton(&self, entity: Entity) -> bool {
+        if let Some(res) = self.get_entity(entity) {
+            res.0
+        } else {
+            // Handle Entity not found
+            false
+        }
+    }
+    fn is_neutron(&self, entity: Entity) -> bool {
+        if let Some(res) = self.get_entity(entity) {
+            res.1
+        } else {
+            // Handle Entity not found
+            false
+        }
+    }
+    fn is_electron(&self, entity: Entity) -> bool {
+        if let Some(res) = self.get_entity(entity) {
+            res.2
+        } else {
+            // Handle Entity not found
+            false
+        }
+    }
+
+
+    fn get_entity(&self, entity: Entity) -> Option<(bool, bool, bool)> {
+        match self.particles.get(entity) {
+            Ok(res) => {
+                Some(res)
+            }
+            Err(_) => {
+                None
+            }
+        }
+    }
+}
+
 
 impl Movement {
     fn speed_limit(&mut self, limit: f32) {
