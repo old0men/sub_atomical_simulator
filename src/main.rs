@@ -68,7 +68,7 @@ fn main() {
                     .run_if(input_just_pressed(KeyCode::Digit2)),
             spawn_neutron.pipe(spawn::spawn_particle)
                     .run_if(input_just_pressed(KeyCode::Digit3)),
-            clear_terminal
+            clear_terminal,
             ).chain(),
         )
         .run();
@@ -89,6 +89,7 @@ fn spawn_neutron() -> Srgba {
 fn clear_terminal(){
     print!("\x1B[2J\x1B[1;1H");
 }
+
 
 impl Movement {
     fn speed_limit(&mut self, limit: f32){

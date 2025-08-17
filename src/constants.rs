@@ -16,3 +16,7 @@ pub const PROTON_MASS: f32 = 1.67e-27;
 
 pub const EULERS_NUMBER: f64 = std::f64::consts::E;
 
+pub const LORENZ_FORCE_CORRECTION: f32 = 10.0;
+
+pub const STRONG_FORCE_CORRECTION: f32 = 19e18;
+

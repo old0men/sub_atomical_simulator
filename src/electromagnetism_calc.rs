@@ -1,7 +1,7 @@
 use bevy::color::palettes::basic::GREEN;
 use bevy::math::Vec2;
 use bevy::prelude::{Gizmos, Query, Transform, Vec3};
-use crate::constants::{COULOMBS_CONSTANT, ELEMENTARY_CHARGE, SCALE};
+use crate::constants::{COULOMBS_CONSTANT, ELEMENTARY_CHARGE, LORENZ_FORCE_CORRECTION, SCALE};
 use crate::{Movement, Particle};
 
 pub fn electrical_field(
@@ -58,6 +58,7 @@ pub fn loretz_force(
     electrical_field: Vec3,
     velocity_vector: Vec3,
     magnetic_field: Vec3,
+    direction_vector: Vec3
 ) -> Vec3 {
 
     //println!("Lorentz------");
@@ -67,13 +68,13 @@ pub fn loretz_force(
 
     let inner_term = electrical_field+velocity_magnetic_field_cross_product;
 
-    charge*inner_term
+    charge*inner_term*LORENZ_FORCE_CORRECTION
 }
 
 
 
 
-//----------------------------------------------------------------------------------------------------------------
+//--------------old code down here *not used* --------------------------------------------------------------------------------------------------
 
 
 

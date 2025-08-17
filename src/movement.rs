@@ -16,6 +16,7 @@ pub fn move_system(mut q_transform: Query<(&mut Transform, &mut Movement), With<
         movement.speed_limit(5.0);
         transform.translation.x += movement.speed.x;
         transform.translation.y += movement.speed.y;
+        movement.speed = Vec3::ZERO;
     }
 }
 
@@ -25,8 +26,14 @@ pub fn acceleration_system(
 ){
     for mut movement in query.iter_mut() {
 
-        if movement.acceleration-movement.prev_acceleration == Vec3::ZERO && movement.acceleration_counter >= 20.0{
+        println!("delta_speed: {}, acc: {}, coutn: {}", movement.acceleration-movement.prev_acceleration, movement.acceleration, movement.acceleration_counter);
+
+        if movement.acceleration == Vec3::ZERO {
+            movement.acceleration_counter = 0.0;
+            continue;
+        } else if movement.acceleration-movement.prev_acceleration == Vec3::ZERO && movement.acceleration_counter >= 20.0{
             movement.acceleration = Vec3::ZERO;
+            movement.prev_acceleration = Vec3::ZERO;
             movement.acceleration_counter = 0.0;
         } else {
             movement.acceleration_counter += 1.0
